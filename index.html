@@ -2,7 +2,7 @@
 <html lang="es">
 <head>
 <meta charset="UTF-8" />
-<title>Juego de Cartas - Selección</title>
+<title>Juego de Cartas - Batalla VS</title>
 <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@700&display=swap" rel="stylesheet" />
 <style>
   * { box-sizing: border-box; }
@@ -13,18 +13,19 @@
     color: #eee;
     text-align: center;
   }
-  h1 { margin-top: 20px; }
-  .container {
+  h1 { margin-top: 20px; margin-bottom: 10px;}
+  .game-container {
     display: flex;
-    justify-content: center;
-    gap: 40px;
-    margin: 20px;
+    justify-content: space-between;
+    align-items: flex-start;
+    padding: 20px 40px;
+    gap: 20px;
   }
   .player {
     background: rgba(255, 255, 255, 0.05);
     border-radius: 20px;
     padding: 20px;
-    width: 320px;
+    width: 280px;
     box-shadow: 0 8px 16px rgba(0,0,0,0.3);
   }
   .cards-list {
@@ -33,13 +34,14 @@
     justify-content: center;
     gap: 10px;
     margin-top: 10px;
+    min-height: 130px;
   }
   .card {
     background: linear-gradient(135deg, #1e90ff, #00bfff);
     border-radius: 15px;
     box-shadow: 0 5px 15px rgba(0,0,0,0.5);
     padding: 10px;
-    width: 120px;
+    width: 110px;
     color: #fff;
     cursor: pointer;
     transition: transform 0.3s, box-shadow 0.3s;
@@ -49,8 +51,8 @@
     transform: scale(1.1);
   }
   .card img {
-    width: 100px;
-    height: 100px;
+    width: 90px;
+    height: 90px;
     border-radius: 12px;
     margin-bottom: 5px;
     border: 3px solid #fff;
@@ -66,7 +68,7 @@
     font-size: 14px;
   }
   button {
-    margin: 15px;
+    margin-top: 10px;
     padding: 12px 25px;
     font-size: 16px;
     border-radius: 12px;
@@ -84,11 +86,40 @@
   button:hover:not(:disabled) {
     background: #ff4757;
   }
-  #result {
-    margin-top: 30px;
-    font-size: 40px;
+  #centerArea {
+    flex: 1;
+    max-width: 350px;
+    background: rgba(255,255,255,0.1);
+    border-radius: 20px;
+    padding: 20px;
+    box-shadow: 0 8px 20px rgba(0,0,0,0.5);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+  }
+  #vsText {
+    font-size: 60px;
     font-weight: 900;
-    min-height: 80px;
+    margin: 0 0 10px 0;
+    color: #ff6b6b;
+    text-shadow: 0 0 15px #ff6b6b;
+  }
+  #battleCards {
+    display: flex;
+    justify-content: center;
+    gap: 30px;
+    margin-bottom: 20px;
+    min-height: 150px;
+  }
+  #battleCards .card {
+    cursor: default;
+  }
+  #result {
+    font-size: 30px;
+    font-weight: 700;
+    min-height: 40px;
+    color: #fff;
+    text-shadow: 0 0 5px #000;
   }
   #finalResult {
     position: fixed;
@@ -114,21 +145,32 @@
 <body>
 
 <h1>Juego de Cartas Batalla - Selecciona tu carta</h1>
-<button id="startBtn">Iniciar Partida</button>
-<button id="playBtn" disabled>Jugar Carta Seleccionada</button>
 
-<div class="container">
+<div class="game-container">
+  <!-- Jugador 1 -->
   <div class="player" id="player1">
     <h2>Jugador 1 (<span id="player1Count">0</span> cartas)</h2>
     <div id="player1Cards" class="cards-list"></div>
   </div>
+
+  <!-- Centro VS -->
+  <div id="centerArea">
+    <div id="vsText">VS</div>
+    <div id="battleCards">
+      <div id="playerCardArea"></div>
+      <div id="cpuCardArea"></div>
+    </div>
+    <button id="playBtn" disabled>Jugar Carta Seleccionada</button>
+    <div id="result"></div>
+  </div>
+
+  <!-- CPU -->
   <div class="player" id="player2">
     <h2>CPU (<span id="player2Count">0</span> cartas)</h2>
-    <div id="player2Card"></div>
+    <div id="player2Cards" class="cards-list"></div>
   </div>
 </div>
 
-<div id="result"></div>
 <div id="finalResult"></div>
 
 <script>
@@ -143,36 +185,33 @@ const cartas = [
   { nombre: "Spiderman", ataque: 80, defensa: 85, imagen: "https://i.imgur.com/Vxg7VEz.png" },
   { nombre: "Batman", ataque: 80, defensa: 85, imagen: "https://i.imgur.com/W7J5pJz.png" },
   { nombre: "Deadpool", ataque: 85, defensa: 70, imagen: "https://i.imgur.com/nUI2NEO.png" }
+  { nombre: "Iron Man", ataque: 90, defensa: 85, imagen: "https://i.imgur.com/tZ9hzo0.png" },
+  { nombre: "Thor", ataque: 95, defensa: 90, imagen: "https://i.imgur.com/1RJoNiB.png" },
+  { nombre: "Hulk", ataque: 100, defensa: 80, imagen: "https://i.imgur.com/fmKS0gA.png" },
+  { nombre: "Wonder Woman", ataque: 85, defensa: 95, imagen: "https://i.imgur.com/fqMZwYy.png" },
+  { nombre: "Flash", ataque: 80, defensa: 75, imagen: "https://i.imgur.com/ZZxGY2W.png" },
+  { nombre: "Black Panther", ataque: 85, defensa: 80, imagen: "https://i.imgur.com/lv4cX2c.png" },
+  { nombre: "Deadshot", ataque: 70, defensa: 85, imagen: "https://i.imgur.com/ZmV7x0n.png" },
+  { nombre: "Aquaman", ataque: 75, defensa: 80, imagen: "https://i.imgur.com/k6UZ1Fx.png" },
+  { nombre: "Green Lantern", ataque: 80, defensa: 85, imagen: "https://i.imgur.com/1iVvxQn.png" },
+  { nombre: "Captain Marvel", ataque: 90, defensa: 90, imagen: "https://i.imgur.com/7pSZtC6.png" }
 ];
 
 let mazo1 = [];
 let mazo2 = [];
-let cartaSeleccionada = null;
+let cartaSeleccionadaIndex = null;
+let cartaJugadorSeleccionada = null;
+let cartaCPUSeleccionada = null;
 
 const player1Count = document.getElementById("player1Count");
 const player2Count = document.getElementById("player2Count");
 const player1CardsDiv = document.getElementById("player1Cards");
-const player2CardDiv = document.getElementById("player2Card");
+const player2CardsDiv = document.getElementById("player2Cards");
+const playerCardArea = document.getElementById("playerCardArea");
+const cpuCardArea = document.getElementById("cpuCardArea");
 const resultDiv = document.getElementById("result");
 const finalResultDiv = document.getElementById("finalResult");
-const startBtn = document.getElementById("startBtn");
 const playBtn = document.getElementById("playBtn");
-
-startBtn.onclick = () => {
-  finalResultDiv.style.display = "none";
-  resultDiv.textContent = "";
-  cartaSeleccionada = null;
-  playBtn.disabled = true;
-  
-  // Barajar y repartir 5 cartas a cada jugador
-  const baraja = [...cartas].sort(() => Math.random() - 0.5);
-  mazo1 = baraja.slice(0,5);
-  mazo2 = baraja.slice(5,10);
-  
-  actualizarUI();
-  mostrarCartasJugador();
-  player2CardDiv.innerHTML = "";
-};
 
 function actualizarUI() {
   player1Count.textContent = mazo1.length;
@@ -193,58 +232,36 @@ function mostrarCartasJugador() {
       </div>
     `;
     cardDiv.onclick = () => seleccionarCarta(index);
-    if (cartaSeleccionada === index) cardDiv.classList.add("selected");
+    if (index === cartaSeleccionadaIndex) cardDiv.classList.add("selected");
     player1CardsDiv.appendChild(cardDiv);
   });
 }
 
+function mostrarCartasCPU() {
+  player2CardsDiv.innerHTML = "";
+  mazo2.forEach((carta, index) => {
+    const cardDiv = document.createElement("div");
+    cardDiv.className = "card";
+    cardDiv.style.cursor = "default";
+    cardDiv.innerHTML = `
+      <img src="${carta.imagen}" alt="${carta.nombre}" />
+      <h4>${carta.nombre}</h4>
+      <div class="stats">
+        <div class="stat">⚔️ ${carta.ataque}</div>
+        <div class="stat">🛡️ ${carta.defensa}</div>
+      </div>
+    `;
+    player2CardsDiv.appendChild(cardDiv);
+  });
+}
+
 function seleccionarCarta(index) {
-  cartaSeleccionada = index;
+  cartaSeleccionadaIndex = index;
   mostrarCartasJugador();
   playBtn.disabled = false;
 }
 
-playBtn.onclick = () => {
-  if (cartaSeleccionada === null) return;
-  // Carta seleccionada del jugador 1
-  const cartaJugador = mazo1[cartaSeleccionada];
-  // Carta que juega CPU (primera carta del mazo2)
-  const cartaCPU = mazo2.shift();
-  player2CardDiv.innerHTML = ""; // limpia la carta anterior
-  
-  mostrarCarta(player2CardDiv, cartaCPU);
-  mostrarCarta(player1CardsDiv, cartaJugador); // para que quede resaltada y actualizada
-  
-  // Quitar la carta seleccionada del mazo1
-  mazo1.splice(cartaSeleccionada,1);
-  cartaSeleccionada = null;
-  playBtn.disabled = true;
-
-  // Comparar cartas
-  let resultado = "";
-  // Usamos la misma lógica que tú tenías:
-  if (cartaJugador.ataque > cartaCPU.defensa && cartaCPU.ataque <= cartaJugador.defensa) {
-    resultado = `¡${cartaJugador.nombre} gana la ronda!`;
-    // Jugador 1 gana, se queda con ambas cartas
-    mazo1.push(cartaJugador, cartaCPU);
-  } else if (cartaCPU.ataque > cartaJugador.defensa && cartaJugador.ataque <= cartaCPU.defensa) {
-    resultado = `¡${cartaCPU.nombre} gana la ronda!`;
-    // CPU gana, se queda con ambas cartas
-    mazo2.push(cartaJugador, cartaCPU);
-  } else {
-    resultado = "¡Empate! Ambas cartas eliminadas.";
-    // cartas se eliminan (ya removidas)
-  }
-  
-  resultDiv.textContent = resultado;
-  actualizarUI();
-  mostrarCartasJugador();
-
-  // Revisar si alguien perdió todas sus cartas
-  if (mazo1.length === 0 || mazo2.length === 0) mostrarGanador();
-};
-
-function mostrarCarta(container, carta) {
+function mostrarCartaEnArea(container, carta) {
   container.innerHTML = `
     <div class="card selected" style="cursor: default;">
       <img src="${carta.imagen}" alt="${carta.nombre}" />
@@ -257,26 +274,12 @@ function mostrarCarta(container, carta) {
   `;
 }
 
-function mostrarGanador() {
-  let mensaje = "";
-  let clase = "";
-  if (mazo1.length > 0 && mazo2.length === 0) {
-    mensaje = "YOU WIN";
-    clase = "win";
-  } else if (mazo2.length > 0 && mazo1.length === 0) {
-    mensaje = "YOU ARE A PUSSY";
-    clase = "lose";
-  } else {
-    mensaje = "EMPATE";
-    clase = "";
-  }
-  finalResultDiv.textContent = mensaje;
-  finalResultDiv.className = clase;
-  finalResultDiv.style.display = "block";
+function iniciarPartida() {
+  finalResultDiv.style.display = "none";
+  resultDiv.textContent = "";
+  cartaSeleccionadaIndex = null;
+  cartaJugadorSeleccionada = null;
+  cartaCPUSeleccionada = null;
   playBtn.disabled = true;
-}
 
-</script>
-
-</body>
-</html>
+  const baraja = [...cartas].sort(() => Math.random() - 0
