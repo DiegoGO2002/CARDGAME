@@ -145,7 +145,7 @@
 <body>
 
 <h1>Juego de Cartas Batalla - Selecciona tu carta</h1>
-
+<button id="startBtn">Iniciar Partida</button>
 <div class="game-container">
   <!-- Jugador 1 -->
   <div class="player" id="player1">
@@ -184,7 +184,7 @@ const cartas = [
   { nombre: "Goku", ataque: 100, defensa: 70, imagen: "https://i.imgur.com/9n1cLeT.png" },
   { nombre: "Spiderman", ataque: 80, defensa: 85, imagen: "https://i.imgur.com/Vxg7VEz.png" },
   { nombre: "Batman", ataque: 80, defensa: 85, imagen: "https://i.imgur.com/W7J5pJz.png" },
-  { nombre: "Deadpool", ataque: 85, defensa: 70, imagen: "https://i.imgur.com/nUI2NEO.png" }
+  { nombre: "Deadpool", ataque: 85, defensa: 70, imagen: "https://i.imgur.com/nUI2NEO.png" },
   { nombre: "Iron Man", ataque: 90, defensa: 85, imagen: "https://i.imgur.com/tZ9hzo0.png" },
   { nombre: "Thor", ataque: 95, defensa: 90, imagen: "https://i.imgur.com/1RJoNiB.png" },
   { nombre: "Hulk", ataque: 100, defensa: 80, imagen: "https://i.imgur.com/fmKS0gA.png" },
@@ -211,7 +211,28 @@ const playerCardArea = document.getElementById("playerCardArea");
 const cpuCardArea = document.getElementById("cpuCardArea");
 const resultDiv = document.getElementById("result");
 const finalResultDiv = document.getElementById("finalResult");
+const startBtn = document.getElementById("startBtn");
 const playBtn = document.getElementById("playBtn");
+
+startBtn.onclick = () => {
+  finalResultDiv.style.display = "none";
+  resultDiv.textContent = "";
+  cartaSeleccionadaIndex = null;
+  cartaJugadorSeleccionada = null;
+  cartaCPUSeleccionada = null;
+  playBtn.disabled = true;
+
+  const baraja = [...cartas].sort(() => Math.random() - 0.5);
+  mazo1 = baraja.slice(0, 5);
+  mazo2 = baraja.slice(5, 10);
+
+  actualizarUI();
+  mostrarCartasJugador();
+  mostrarCartasCPU();
+
+  playerCardArea.innerHTML = "";
+  cpuCardArea.innerHTML = "";
+};
 
 function actualizarUI() {
   player1Count.textContent = mazo1.length;
@@ -239,7 +260,7 @@ function mostrarCartasJugador() {
 
 function mostrarCartasCPU() {
   player2CardsDiv.innerHTML = "";
-  mazo2.forEach((carta, index) => {
+  mazo2.forEach(carta => {
     const cardDiv = document.createElement("div");
     cardDiv.className = "card";
     cardDiv.style.cursor = "default";
@@ -261,6 +282,46 @@ function seleccionarCarta(index) {
   playBtn.disabled = false;
 }
 
+playBtn.onclick = () => {
+  if (cartaSeleccionadaIndex === null) return;
+
+  // Carta del jugador seleccionada
+  cartaJugadorSeleccionada = mazo1.splice(cartaSeleccionadaIndex, 1)[0];
+  cartaSeleccionadaIndex = null;
+
+  // Carta CPU: la primera del mazo
+  cartaCPUSeleccionada = mazo2.shift();
+
+  // Mostrar cartas en centro
+  mostrarCartaEnArea(playerCardArea, cartaJugadorSeleccionada);
+  mostrarCartaEnArea(cpuCardArea, cartaCPUSeleccionada);
+
+  // Mostrar cartas restantes
+  mostrarCartasJugador();
+  mostrarCartasCPU();
+
+  // Desactivar botón jugar mientras se ve resultado
+  playBtn.disabled = true;
+
+  // Comparar ataque y defensa
+  let resultadoTexto = "";
+  if (cartaJugadorSeleccionada.ataque > cartaCPUSeleccionada.defensa && cartaCPUSeleccionada.ataque <= cartaJugadorSeleccionada.defensa) {
+    resultadoTexto = `¡${cartaJugadorSeleccionada.nombre} gana la ronda!`;
+    mazo1.push(cartaJugadorSeleccionada, cartaCPUSeleccionada); // jugador se queda con ambas
+  } else if (cartaCPUSeleccionada.ataque > cartaJugadorSeleccionada.defensa && cartaJugadorSeleccionada.ataque <= cartaCPUSeleccionada.defensa) {
+    resultadoTexto = `¡${cartaCPUSeleccionada.nombre} gana la ronda!`;
+    mazo2.push(cartaJugadorSeleccionada, cartaCPUSeleccionada); // CPU se queda con ambas
+  } else {
+    resultadoTexto = "¡Empate! Ambas cartas eliminadas.";
+    // ninguna carta regresa al mazo
+  }
+  resultDiv.textContent = resultadoTexto;
+  actualizarUI();
+
+  // Revisar si alguien perdió todas las cartas
+  if (mazo1.length === 0 || mazo2.length === 0) mostrarGanador();
+};
+
 function mostrarCartaEnArea(container, carta) {
   container.innerHTML = `
     <div class="card selected" style="cursor: default;">
@@ -274,12 +335,26 @@ function mostrarCartaEnArea(container, carta) {
   `;
 }
 
-function iniciarPartida() {
-  finalResultDiv.style.display = "none";
-  resultDiv.textContent = "";
-  cartaSeleccionadaIndex = null;
-  cartaJugadorSeleccionada = null;
-  cartaCPUSeleccionada = null;
+function mostrarGanador() {
+  let mensaje = "";
+  let clase = "";
+  if (mazo1.length > 0 && mazo2.length === 0) {
+    mensaje = "YOU WIN";
+    clase = "win";
+  } else if (mazo2.length > 0 && mazo1.length === 0) {
+    mensaje = "YOU ARE A PUSSY";
+    clase = "lose";
+  } else {
+    mensaje = "EMPATE";
+    clase = "";
+  }
+  finalResultDiv.textContent = mensaje;
+  finalResultDiv.className = clase;
+  finalResultDiv.style.display = "block";
   playBtn.disabled = true;
+}
+</script>
 
-  const baraja = [...cartas].sort(() => Math.random() - 0
+</body>
+</html>
+
