@@ -81,8 +81,20 @@
   }
   #result {
     margin-top: 20px;
-    font-size: 24px;
+    font-size: 30px;
     font-weight: bold;
+    transition: all 0.5s ease-in-out;
+  }
+  .win { color: #00ff00; text-shadow: 0 0 15px #00ff00; }
+  .lose { color: #ff2222; text-shadow: 0 0 15px #ff0000; animation: shake 0.5s infinite alternate; }
+  .draw { color: #ffff00; text-shadow: 0 0 15px #ffff00; animation: glow 1.5s infinite alternate; }
+  @keyframes shake {
+    from { transform: rotate(-3deg); }
+    to { transform: rotate(3deg); }
+  }
+  @keyframes glow {
+    from { text-shadow: 0 0 15px #ffff00; }
+    to { text-shadow: 0 0 25px #ffff00; }
   }
 </style>
 </head>
@@ -114,11 +126,11 @@
 const cartas = [
   { nombre: "John Cena", ataque: 90, defensa: 80, imagen: "https://www.kindpng.com/picc/m/36-369716_john-cena-clipart-animated-john-cena-cartoon-png.png" },
   { nombre: "Dr. Simi", ataque: 70, defensa: 95, imagen: "https://cdn.drsimi.com.mx/assets/img/drsimi/slider2.png" },
-  { nombre: "La Roca", ataque: 95, defensa: 70, imagen: "https://upload.wikimedia.org/wikipedia/en/e/e0/Dwayne_Johnson_as_the_Rock.png" },
-  { nombre: "Chabelo", ataque: 50, defensa: 100, imagen: "https://i.imgur.com/fqhNArU.png" },
+  { nombre: "La Roca", ataque: 95, defensa: 70, imagen: "https://image-cdn.essentiallysports.com/wp-content/uploads/The-Rock-Dwayne-Johnson-1.png" },
+  { nombre: "Chabelo", ataque: 50, defensa: 100, imagen: "https://c3.klipartz.com/pngpicture/1002/23/sticker-png-chabelo-001-0001-thumbnail.png" },
+  { nombre: "Capitán América", ataque: 80, defensa: 95, imagen: "https://cosplayware.s3.amazonaws.com/wp-content/uploads/2023/03/11123342/JYZCOS-Adult-Captain-America-Costume-Carton-Hallow-1.png" },
   { nombre: "Shrek", ataque: 85, defensa: 90, imagen: "https://upload.wikimedia.org/wikipedia/en/3/39/Shrek.png" },
   { nombre: "Goku", ataque: 100, defensa: 70, imagen: "https://i.imgur.com/9n1cLeT.png" },
-  { nombre: "Vegeta", ataque: 95, defensa: 75, imagen: "https://i.imgur.com/Gm7RDEm.png" },
   { nombre: "Spiderman", ataque: 80, defensa: 85, imagen: "https://i.imgur.com/Vxg7VEz.png" },
   { nombre: "Batman", ataque: 70, defensa: 90, imagen: "https://i.imgur.com/W7J5pJz.png" },
   { nombre: "Deadpool", ataque: 85, defensa: 80, imagen: "https://i.imgur.com/nUI2NEO.png" }
@@ -147,6 +159,7 @@ startBtn.onclick = function() {
   mazo2 = baraja.slice(5,10);
   actualizarUI();
   resultDiv.textContent = "¡Partida iniciada!";
+  resultDiv.className = "";
   nextBtn.disabled = false;
 };
 
@@ -162,10 +175,7 @@ nextBtn.onclick = function() {
   else resultado = "¡Empate! Ambas cartas eliminadas.";
   resultDiv.textContent = resultado;
   actualizarUI();
-  if (mazo1.length === 0 || mazo2.length === 0) {
-    resultDiv.textContent += mazo1.length > 0 ? " ¡Jugador 1 gana la partida!" : mazo2.length > 0 ? ` ¡${modo === 'pvp' ? 'Jugador 2' : 'CPU'} gana la partida!` : " ¡Empate total!";
-    nextBtn.disabled = true;
-  }
+  if (mazo1.length === 0 || mazo2.length === 0) mostrarGanador();
 };
 
 function actualizarUI() {
@@ -183,6 +193,20 @@ function mostrarCarta(container, carta) {
         <div class="stat">🛡️ ${carta.defensa}</div>
       </div>
     </div>`;
+}
+
+function mostrarGanador() {
+  nextBtn.disabled = true;
+  if (mazo1.length > mazo2.length) {
+    resultDiv.innerHTML = "YOU WIN";
+    resultDiv.className = "win";
+  } else if (mazo2.length > mazo1.length) {
+    resultDiv.innerHTML = "YOU ARE A PUSSY";
+    resultDiv.className = "lose";
+  } else {
+    resultDiv.innerHTML = "BORRING DRAW";
+    resultDiv.className = "draw";
+  }
 }
 </script>
 </body>
