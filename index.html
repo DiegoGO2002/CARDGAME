@@ -1,116 +1,443 @@
 <!DOCTYPE html>
 <html lang="es">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Juego de Cartas VS</title>
-  <style>
-    body { font-family: Arial, sans-serif; text-align: center; background: #111; color: white; }
-    .contenedor { display: flex; flex-wrap: wrap; justify-content: center; margin-top: 20px; }
-    .carta { border: 2px solid #fff; margin: 10px; padding: 10px; width: 150px; background: #222; cursor: pointer; }
-    .carta img { width: 100px; height: 100px; }
-    .versus { font-size: 48px; margin: 20px 0; }
-    .resultado { font-size: 24px; margin-top: 20px; }
-    button { padding: 10px 20px; margin: 10px; font-size: 18px; cursor: pointer; }
-  </style>
+<meta charset="UTF-8" />
+<title>Juego de Cartas - Batalla VS</title>
+<link href="https://fonts.googleapis.com/css2?family=Roboto:wght@700&display=swap" rel="stylesheet" /> 
+<style>
+  * { box-sizing: border-box; }
+  body {
+    font-family: 'Roboto', sans-serif;
+    margin: 0;
+    background: linear-gradient(to bottom, #0f2027, #203a43, #2c5364);
+    color: #eee;
+    text-align: center;
+  }
+  h1 { margin-top: 20px; margin-bottom: 10px;}
+  .game-container {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    padding: 20px 40px;
+    gap: 20px;
+  }
+  .player {
+    background: rgba(255, 255, 255, 0.05);
+    border-radius: 20px;
+    padding: 20px;
+    width: 280px;
+    box-shadow: 0 8px 16px rgba(0,0,0,0.3);
+  }
+  .cards-list {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 10px;
+    margin-top: 10px;
+    min-height: 130px;
+  }
+  .card {
+    background: linear-gradient(135deg, #1e90ff, #00bfff);
+    border-radius: 15px;
+    box-shadow: 0 5px 15px rgba(0,0,0,0.5);
+    padding: 10px;
+    width: 110px;
+    color: #fff;
+    cursor: pointer;
+    transition: transform 0.3s, box-shadow 0.3s;
+    user-select: none;
+  }
+  .card.selected {
+    box-shadow: 0 0 20px 4px #ff6b6b;
+    transform: scale(1.1);
+  }
+  .card img {
+    width: 90px;
+    height: 90px;
+    border-radius: 12px;
+    margin-bottom: 5px;
+    border: 3px solid #fff;
+  }
+  .stats {
+    display: flex;
+    justify-content: space-around;
+  }
+  .stat {
+    background: rgba(0,0,0,0.3);
+    padding: 3px 6px;
+    border-radius: 8px;
+    font-size: 14px;
+  }
+  button {
+    margin-top: 10px;
+    padding: 12px 25px;
+    font-size: 16px;
+    border-radius: 12px;
+    border: none;
+    background: #ff6b6b;
+    color: white;
+    font-weight: bold;
+    cursor: pointer;
+    transition: background 0.3s;
+  }
+  button:disabled {
+    background: #999;
+    cursor: not-allowed;
+  }
+  button:hover:not(:disabled) {
+    background: #ff4757;
+  }
+  #centerArea {
+    flex: 1;
+    max-width: 350px;
+    background: rgba(255,255,255,0.1);
+    border-radius: 20px;
+    padding: 20px;
+    box-shadow: 0 8px 20px rgba(0,0,0,0.5);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+  }
+  #vsText {
+    font-size: 60px;
+    font-weight: 900;
+    margin: 0 0 10px 0;
+    color: #ff6b6b;
+    text-shadow: 0 0 15px #ff6b6b;
+  }
+  #battleCards {
+    display: flex;
+    justify-content: center;
+    gap: 30px;
+    margin-bottom: 20px;
+    min-height: 150px;
+  }
+  #battleCards .card {
+    cursor: default;
+  }
+  #result {
+    font-size: 36px;
+    font-weight: 900;
+    min-height: 60px;
+    color: #fff;
+    text-shadow: 0 0 10px #000;
+    margin-bottom: 15px;
+  }
+  #result.win {
+    color: #00ff00;
+    text-shadow: 0 0 15px #00ff00;
+  }
+  #result.lose {
+    color: #ff2222;
+    text-shadow: 0 0 15px #ff2222;
+  }
+  #result.draw {
+    color: #ffff66;
+    text-shadow: 0 0 15px #ffff66;
+  }
+  #finalResult {
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    font-size: 70px;
+    font-weight: 900;
+    display: none;
+    padding: 40px 60px;
+    border-radius: 20px;
+    z-index: 100;
+    background: rgba(0,0,0,0.85);
+    color: #00ff00;
+    text-shadow: 0 0 20px #00ff00;
+  }
+  #finalResult.lose {
+    color: #ff2222;
+    text-shadow: 0 0 20px #ff2222;
+  }
+</style>
 </head>
 <body>
-  <h1>Selecciona tus 5 cartas</h1>
-  <div id="seleccion" class="contenedor"></div>
-  <button onclick="iniciarBatalla()" id="btnIniciar" disabled>Iniciar Combate</button>
-  <div id="combate" style="display:none">
-    <div class="contenedor">
-      <div id="jugadorCarta" class="carta"></div>
-      <div class="versus">VS</div>
-      <div id="cpuCarta" class="carta"></div>
-    </div>
-    <div class="resultado" id="resultado"></div>
-    <button onclick="siguienteRonda()">Siguiente Ronda</button>
+
+<h1>Juego de Cartas Batalla - Selecciona 5 cartas</h1>
+<button id="startBtn">Iniciar / Reiniciar Juego</button>
+<button id="confirmSelectionBtn" disabled>Confirmar Selección</button>
+
+<div class="game-container">
+  <!-- Selección jugador -->
+  <div class="player" id="player1">
+    <h2>Jugador 1 - Selección (<span id="selectedCount">0</span>/5)</h2>
+    <div id="allCards" class="cards-list"></div>
   </div>
 
-  <script>
-    const personajes = [
-      { nombre: "John Cena", ataque: 90, defensa: 80, imagen: "https://www.kindpng.com/picc/m/36-369716_john-cena-clipart-animated-john-cena-cartoon-png.png" },
-      { nombre: "Dr. Simi", ataque: 65, defensa: 95, imagen: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRvsWlM_-L_KvapF1G6EemU74xESV6iT1qVew&s" },
-      { nombre: "La Roca", ataque: 95, defensa: 80, imagen: "https://image-cdn.essentiallysports.com/wp-content/uploads/The-Rock-Dwayne-Johnson-1.png" },
-      { nombre: "Chabelo", ataque: 30, defensa: 100, imagen: "https://phantom-marca-mx.unidadeditorial.es/1c9cfde33650a22f724f9bcc92732dc8/resize/660/f/webp/mx/assets/multimedia/imagenes/2023/03/25/16797610129495.jpg" },
-      { nombre: "Capitán América", ataque: 85, defensa: 95, imagen: "https://www.pngitem.com/middle/JbTiJi_minions-png-minion-captain-america-png-transparent-png/" },
-      { nombre: "Shrek", ataque: 70, defensa: 50, imagen: "https://pbs.twimg.com/media/F2al76HXIAAECsx.jpg" },
-      { nombre: "Goku", ataque: 100, defensa: 90, imagen: "https://pbs.twimg.com/media/GtBWdtZXwAAqC0B?format=png&name=4096x4096" },
-      { nombre: "Spiderman", ataque: 80, defensa: 85, imagen: "https://i.imgur.com/Vxg7VEz.png" },
-      { nombre: "Julio Regalado", ataque: 80, defensa: 85, imagen: "https://i.imgur.com/W7J5pJz.png" },
-      { nombre: "Deadpool", ataque: 85, defensa: 70, imagen: "https://i.imgur.com/nUI2NEO.png" },
-      { nombre: "Iron Man", ataque: 90, defensa: 85, imagen: "https://i.imgur.com/tZ9hzo0.png" },
-      { nombre: "Thor", ataque: 95, defensa: 90, imagen: "https://i.imgur.com/1RJoNiB.png" },
-      { nombre: "MAMA LUCHA", ataque: 100, defensa: 80, imagen: "https://i.imgur.com/fmKS0gA.png" },
-      { nombre: "Wonder Woman", ataque: 75, defensa: 70, imagen: "https://i.imgur.com/fqMZwYy.png" },
-      { nombre: "Santa CLous", ataque: 80, defensa: 75, imagen: "https://i.imgur.com/ZZxGY2W.png" },
-      { nombre: "Chuponcito", ataque: 85, defensa: 80, imagen: "https://i.imgur.com/lv4cX2c.png" },
-      { nombre: "Gerry", ataque: 70, defensa: 55, imagen: "https://i.imgur.com/ZmV7x0n.png" },
-      { nombre: "Canelo", ataque: 75, defensa: 80, imagen: "https://i.imgur.com/k6UZ1Fx.png" },
-      { nombre: "Green Lantern", ataque: 58, defensa: 55, imagen: "https://i.imgur.com/1iVvxQn.png" },
-      { nombre: "Captain Marvel", ataque: 80, defensa: 75, imagen: "https://i.imgur.com/7pSZtC6.png" }
-    ];
+  <!-- Centro VS -->
+  <div id="centerArea" style="display:none;">
+    <div id="vsText">VS</div>
+    <div id="battleCards">
+      <div id="playerCardArea"></div>
+      <div id="cpuCardArea"></div>
+    </div>
+    <button id="playBtn" disabled>Jugar Carta Seleccionada</button>
+    <div id="result"></div>
+  </div>
 
-    let seleccionadasJugador = [];
-    let seleccionadasCPU = [];
-    let ronda = 0;
+  <!-- Mazo CPU -->
+  <div class="player" id="player2" style="display:none;">
+    <h2>CPU (5 cartas)</h2>
+    <div id="cpuSelectedCards" class="cards-list"></div>
+  </div>
+</div>
 
-    const seleccionDiv = document.getElementById("seleccion");
-    personajes.forEach((p, i) => {
-      const carta = document.createElement("div");
-      carta.className = "carta";
-      carta.innerHTML = `<img src="${p.imagen}"><br>${p.nombre}<br>Ataque: ${p.ataque}<br>Defensa: ${p.defensa}`;
-      carta.onclick = () => seleccionarCarta(i, carta);
-      seleccionDiv.appendChild(carta);
-    });
+<div id="finalResult"></div>
 
-    function seleccionarCarta(index, cartaElemento) {
-      if (seleccionadasJugador.length < 5 && !seleccionadasJugador.includes(index)) {
-        seleccionadasJugador.push(index);
-        cartaElemento.style.border = "3px solid lime";
-      }
-      if (seleccionadasJugador.length === 5) {
-        document.getElementById("btnIniciar").disabled = false;
-      }
-    }
+<script>
+const personajes = [
+  { nombre: "John Cena", ataque: 90, defensa: 80, imagen: "https://www.kindpng.com/picc/m/36-369716_john-cena-clipart-animated-john-cena-cartoon-png.png" },
+  { nombre: "Dr. Simi", ataque: 65, defensa: 95, imagen: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRvsWlM_-L_KvapF1G6EemU74xESV6iT1qVew&s" },
+  { nombre: "La Roca", ataque: 95, defensa: 80, imagen: "https://image-cdn.essentiallysports.com/wp-content/uploads/The-Rock-Dwayne-Johnson-1.png" },
+  { nombre: "Chabelo", ataque: 30, defensa: 100, imagen: "https://phantom-marca-mx.unidadeditorial.es/1c9cfde33650a22f724f9bcc92732dc8/resize/660/f/webp/mx/assets/multimedia/imagenes/2023/03/25/16797610129495.jpg" },
+  { nombre: "Capitán América", ataque: 85, defensa: 95, imagen: "https://www.pngitem.com/middle/JbTiJi_minions-png-minion-captain-america-png-transparent-png/" },
+  { nombre: "Shrek", ataque: 70, defensa: 50, imagen: "https://pbs.twimg.com/media/F2al76HXIAAECsx.jpg" },
+  { nombre: "Goku", ataque: 100, defensa: 90, imagen: "https://pbs.twimg.com/media/GtBWdtZXwAAqC0B?format=png&name=4096x4096" },
+  { nombre: "Spiderman", ataque: 80, defensa: 85, imagen: "https://i.imgur.com/Vxg7VEz.png" },
+  { nombre: "Julio Regalado", ataque: 80, defensa: 85, imagen: "https://i.imgur.com/W7J5pJz.png" },
+  { nombre: "Deadpool", ataque: 85, defensa: 70, imagen: "https://i.imgur.com/nUI2NEO.png" },
+  { nombre: "Iron Man", ataque: 90, defensa: 85, imagen: "https://i.imgur.com/tZ9hzo0.png" },
+  { nombre: "Thor", ataque: 95, defensa: 90, imagen: "https://i.imgur.com/1RJoNiB.png" },
+  { nombre: "MAMA LUCHA", ataque: 100, defensa: 80, imagen: "https://i.imgur.com/fmKS0gA.png" },
+  { nombre: "Wonder Woman", ataque: 75, defensa: 70, imagen: "https://i.imgur.com/fqMZwYy.png" },
+  { nombre: "Santa CLous", ataque: 80, defensa: 75, imagen: "https://i.imgur.com/ZZxGY2W.png" },
+  { nombre: "Chuponcito", ataque: 85, defensa: 80, imagen: "https://i.imgur.com/lv4cX2c.png" },
+  { nombre: "Gerry", ataque: 70, defensa: 55, imagen: "https://i.imgur.com/ZmV7x0n.png" },
+  { nombre: "Canelo", ataque: 75, defensa: 80, imagen: "https://i.imgur.com/k6UZ1Fx.png" },
+  { nombre: "Green Lantern", ataque: 58, defensa: 55, imagen: "https://i.imgur.com/1iVvxQn.png" },
+  { nombre: "Captain Marvel", ataque: 80, defensa: 75, imagen: "https://i.imgur.com/7pSZtC6.png" }
+];
 
-    function iniciarBatalla() {
-      while (seleccionadasCPU.length < 5) {
-        const random = Math.floor(Math.random() * personajes.length);
-        if (!seleccionadasJugador.includes(random) && !seleccionadasCPU.includes(random)) {
-          seleccionadasCPU.push(random);
-        }
-      }
-      document.getElementById("seleccion").style.display = "none";
-      document.getElementById("btnIniciar").style.display = "none";
-      document.getElementById("combate").style.display = "block";
-      mostrarRonda();
-    }
+let seleccionJugador = [];
+let seleccionCPU = [];
+let combateIniciado = false;
 
-    function mostrarRonda() {
-      const p1 = personajes[seleccionadasJugador[ronda]];
-      const p2 = personajes[seleccionadasCPU[ronda]];
+const allCardsDiv = document.getElementById("allCards");
+const selectedCountSpan = document.getElementById("selectedCount");
+const confirmSelectionBtn = document.getElementById("confirmSelectionBtn");
+const centerArea = document.getElementById("centerArea");
+const cpuArea = document.getElementById("player2");
+const cpuSelectedCardsDiv = document.getElementById("cpuSelectedCards");
+const playerCardArea = document.getElementById("playerCardArea");
+const cpuCardArea = document.getElementById("cpuCardArea");
+const playBtn = document.getElementById("playBtn");
+const resultDiv = document.getElementById("result");
+const finalResultDiv = document.getElementById("finalResult");
+const startBtn = document.getElementById("startBtn");
 
-      document.getElementById("jugadorCarta").innerHTML = `<img src="${p1.imagen}"><br>${p1.nombre}<br>Ataque: ${p1.ataque}<br>Defensa: ${p1.defensa}`;
-      document.getElementById("cpuCarta").innerHTML = `<img src="${p2.imagen}"><br>${p2.nombre}<br>Ataque: ${p2.ataque}<br>Defensa: ${p2.defensa}`;
+function reiniciarJuego() {
+  seleccionJugador = [];
+  seleccionCPU = [];
+  combateIniciado = false;
+  selectedCountSpan.textContent = "0";
+  confirmSelectionBtn.disabled = true;
+  playBtn.disabled = true;
+  finalResultDiv.style.display = "none";
+  resultDiv.textContent = "";
+  centerArea.style.display = "none";
+  cpuArea.style.display = "none";
+  allCardsDiv.style.pointerEvents = "auto";
+  startBtn.disabled = false;
+  mostrarTodasCartas();
+  document.querySelector("h1").textContent = "Juego de Cartas Batalla - Selecciona 5 cartas";
+}
+startBtn.onclick = () => {
+  reiniciarJuego();
+}
 
-      const resultado = (p1.ataque - p2.defensa) + (p1.defensa - p2.ataque);
-      let texto = "Empate";
-      if (resultado > 0) texto = "¡Gana Jugador!";
-      else if (resultado < 0) texto = "¡Gana CPU!";
-
-      document.getElementById("resultado").innerText = texto;
-    }
-
-    function siguienteRonda() {
-      ronda++;
-      if (ronda < 5) {
-        mostrarRonda();
+function mostrarTodasCartas() {
+  allCardsDiv.innerHTML = "";
+  personajes.forEach((p, i) => {
+    const cardDiv = document.createElement("div");
+    cardDiv.className = "card";
+    cardDiv.innerHTML = `
+      <img src="${p.imagen}" alt="${p.nombre}" />
+      <h4>${p.nombre}</h4>
+      <div class="stats">
+        <div class="stat">⚔️ ${p.ataque}</div>
+        <div class="stat">🛡️ ${p.defensa}</div>
+      </div>
+    `;
+    cardDiv.onclick = () => {
+      if (combateIniciado) return; // no seleccionar si ya empezó
+      if (seleccionJugador.includes(i)) {
+        // Deseleccionar
+        seleccionJugador = seleccionJugador.filter(x => x !== i);
+        cardDiv.classList.remove("selected");
       } else {
-        document.getElementById("resultado").innerText += "\n¡Combate Finalizado!";
+        if (seleccionJugador.length >= 5) return; // máximo 5 cartas
+        seleccionJugador.push(i);
+        cardDiv.classList.add("selected");
       }
+      selectedCountSpan.textContent = seleccionJugador.length;
+      confirmSelectionBtn.disabled = (seleccionJugador.length !== 5);
+    };
+    allCardsDiv.appendChild(cardDiv);
+  });
+}
+
+confirmSelectionBtn.onclick = () => {
+  if (seleccionJugador.length !== 5) return;
+  combateIniciado = true;
+  confirmSelectionBtn.disabled = true;
+  allCardsDiv.style.pointerEvents = "none";
+  startBtn.disabled = true;
+
+  // Seleccionar 5 cartas aleatorias para CPU que no estén en selección jugador
+  let indicesDisponibles = personajes.map((_, i) => i).filter(i => !seleccionJugador.includes(i));
+  indicesDisponibles = indicesDisponibles.sort(() => Math.random() - 0.5);
+  seleccionCPU = indicesDisponibles.slice(0, 5);
+
+  // Mostrar cartas CPU
+  mostrarCartasCPU();
+
+  // Preparar mazos para combate
+  mazoJugador = seleccionJugador.map(i => personajes[i]);
+  mazoCPU = seleccionCPU.map(i => personajes[i]);
+
+  // Mostrar área combate
+  centerArea.style.display = "flex";
+  cpuArea.style.display = "block";
+  document.querySelector("h1").textContent = "Combate iniciado - Juega tus cartas";
+
+  playBtn.disabled = false;
+  resultDiv.textContent = "";
+  finalResultDiv.style.display = "none";
+
+  mostrarSiguienteCartas();  
+};
+
+function mostrarCartasCPU() {
+  cpuSelectedCardsDiv.innerHTML = "";
+  seleccionCPU.forEach(i => {
+    const p = personajes[i];
+    const cardDiv = document.createElement("div");
+    cardDiv.className = "card selected";
+    cardDiv.style.cursor = "default";
+    cardDiv.innerHTML = `
+      <img src="${p.imagen}" alt="${p.nombre}" />
+      <h4>${p.nombre}</h4>
+      <div class="stats">
+        <div class="stat">⚔️ ${p.ataque}</div>
+        <div class="stat">🛡️ ${p.defensa}</div>
+      </div>
+    `;
+    cpuSelectedCardsDiv.appendChild(cardDiv);
+  });
+}
+
+let mazoJugador = [];
+let mazoCPU = [];
+
+let cartaJugadorActual = null;
+let cartaCPUActual = null;
+
+function mostrarSiguienteCartas() {
+  playerCardArea.innerHTML = "";
+  cpuCardArea.innerHTML = "";
+  resultDiv.textContent = "";
+  if (mazoJugador.length === 0 || mazoCPU.length === 0) {
+    terminarJuego();
+    return;
+  }
+  cartaJugadorActual = null;
+  cartaCPUActual = null;
+  playBtn.disabled = false;
+}
+
+playBtn.onclick = () => {
+  if (mazoJugador.length === 0 || mazoCPU.length === 0) return;
+
+  // Sacar la primera carta de cada mazo
+  cartaJugadorActual = mazoJugador.shift();
+  cartaCPUActual = mazoCPU.shift();
+
+  mostrarCartaEnArea(playerCardArea, cartaJugadorActual);
+  mostrarCartaEnArea(cpuCardArea, cartaCPUActual);
+
+  // Comparar ataque y defensa (tu fórmula)
+  // Puntos jugador = ataque jugador - defensa cpu (mínimo 0)
+  // Puntos cpu = ataque cpu - defensa jugador (mínimo 0)
+  let puntosJugador = cartaJugadorActual.ataque - cartaCPUActual.defensa;
+  if (puntosJugador < 0) puntosJugador = 0;
+  let puntosCPU = cartaCPUActual.ataque - cartaJugadorActual.defensa;
+  if (puntosCPU < 0) puntosCPU = 0;
+
+  // Mostrar resultado de la ronda
+  if (puntosJugador > puntosCPU) {
+    resultDiv.textContent = `GANASTE ESTA RONDA! (+${puntosJugador} vs +${puntosCPU})`;
+    resultDiv.className = "win";
+    // Jugador gana, carta CPU se pierde, carta jugador vuelve al mazo al final
+    mazoJugador.push(cartaJugadorActual);
+  } else if (puntosCPU > puntosJugador) {
+    resultDiv.textContent = `PERDISTE ESTA RONDA! (+${puntosCPU} vs +${puntosJugador})`;
+    resultDiv.className = "lose";
+    // CPU gana, carta jugador se pierde, carta CPU vuelve al mazo
+    mazoCPU.push(cartaCPUActual);
+  } else {
+    resultDiv.textContent = `EMPATE EN ESTA RONDA! (+${puntosJugador} vs +${puntosCPU})`;
+    resultDiv.className = "draw";
+    // Empate, ambas cartas se pierden (no regresan a mazos)
+  }
+
+  playBtn.disabled = true;
+
+  setTimeout(() => {
+    if (mazoJugador.length === 0 || mazoCPU.length === 0) {
+      terminarJuego();
+    } else {
+      mostrarSiguienteCartas();
     }
-  </script>
+  }, 1800);
+};
+
+function mostrarCartaEnArea(container, carta) {
+  container.innerHTML = `
+    <div class="card selected" style="cursor: default;">
+      <img src="${carta.imagen}" alt="${carta.nombre}" />
+      <h4>${carta.nombre}</h4>
+      <div class="stats">
+        <div class="stat">⚔️ ${carta.ataque}</div>
+        <div class="stat">🛡️ ${carta.defensa}</div>
+      </div>
+    </div>
+  `;
+}
+
+function terminarJuego() {
+  let mensaje = "";
+  let clase = "";
+  if (mazoJugador.length > mazoCPU.length) {
+    mensaje = "¡GANASTE EL JUEGO!";
+    clase = "win";
+  } else if (mazoCPU.length > mazoJugador.length) {
+    mensaje = "PERDISTE EL JUEGO";
+    clase = "lose";
+  } else {
+    mensaje = "EL JUEGO TERMINÓ EN EMPATE";
+    clase = "draw";
+  }
+  finalResultDiv.textContent = mensaje;
+  finalResultDiv.className = clase;
+  finalResultDiv.style.display = "block";
+
+  playBtn.disabled = true;
+  confirmSelectionBtn.disabled = true;
+  allCardsDiv.style.pointerEvents = "none";
+  startBtn.disabled = false;
+}
+
+window.onload = () => {
+  reiniciarJuego();
+};
+
+</script>
+
 </body>
 </html>
+
