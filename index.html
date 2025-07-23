@@ -1,184 +1,152 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="es">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Carta VS</title>
+  <title>Batalla de Cartas</title>
   <style>
     body {
-      margin: 0;
-      padding: 0;
-      font-family: Arial, sans-serif;
-      background-color: #121212;
+      font-family: Arial;
+      background-color: #111;
       color: white;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-    }
-
-    h1 {
-      margin: 20px 0;
       text-align: center;
     }
 
-    #game {
+    .cartas {
       display: flex;
-      justify-content: space-between;
-      align-items: center;
-      width: 90%;
-      max-width: 1200px;
-      margin: 20px auto;
-    }
-
-    .deck {
-      display: flex;
-      flex-direction: column;
-      gap: 10px;
-      align-items: center;
-    }
-
-    .card {
-      width: 100px;
-      height: 150px;
-      background-color: #333;
-      border: 2px solid white;
-      display: flex;
+      flex-wrap: wrap;
       justify-content: center;
-      align-items: center;
-      cursor: pointer;
-    }
-
-    .card.selected {
-      border-color: limegreen;
-    }
-
-    .vs-area {
-      display: flex;
-      flex-direction: column;
-      align-items: center;
       gap: 20px;
+      margin-top: 20px;
     }
 
-    .vs-text {
-      font-size: 4rem;
-      font-weight: bold;
-      color: red;
-    }
-
-    .card-image {
-      width: 200px;
-      height: auto;
-    }
-
-    #result {
-      font-size: 3rem;
-      margin-top: 30px;
-      text-align: center;
-    }
-
-    #confirmBtn {
-      margin-top: 10px;
-      padding: 10px 20px;
-      font-size: 1rem;
-      background: limegreen;
-      border: none;
+    .carta {
+      width: 100px;
+      height: 140px;
+      border: 2px solid white;
+      border-radius: 10px;
+      overflow: hidden;
       cursor: pointer;
+      background-color: #222;
+      transition: transform 0.2s;
+    }
+
+    .carta:hover {
+      transform: scale(1.1);
+    }
+
+    .carta img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+    }
+
+    #seleccionada {
+      margin-top: 30px;
+    }
+
+    .imagen-grande {
+      height: 300px;
+      margin: 20px;
+    }
+
+    .vs {
+      font-size: 40px;
+      margin: 0 20px;
+    }
+
+    #resultado {
+      font-size: 24px;
+      margin-top: 20px;
+      font-weight: bold;
     }
   </style>
 </head>
 <body>
-  <h1>Selecciona tu carta</h1>
-  <div id="game">
-    <div class="deck" id="playerDeck"></div>
 
-    <div class="vs-area">
-      <div class="vs-text">VS</div>
-      <div class="vs-cards">
-        <img id="playerImage" class="card-image" src="" style="display:none" />
-        <img id="enemyImage" class="card-image" src="" style="display:none" />
-      </div>
-      <button id="confirmBtn" disabled>CONFIRMAR</button>
-      <div id="result"></div>
-    </div>
+  <h1>Elige tu carta</h1>
+  <div class="cartas" id="cartas-container"></div>
 
-    <div class="deck" id="enemyDeck">
-      <div class="card">???</div>
+  <div id="seleccionada"></div>
+
+  <div id="versus" style="display: none;">
+    <div style="display: flex; justify-content: center; align-items: center;">
+      <img id="img1" class="imagen-grande">
+      <span class="vs">VS</span>
+      <img id="img2" class="imagen-grande">
     </div>
+    <div id="resultado"></div>
   </div>
 
   <script>
-    const characters = [
-  { nombre: "John Cena", ataque: 90, defensa: 80, imagen: "https://www.kindpng.com/picc/m/36-369716_john-cena-clipart-animated-john-cena-cartoon-png.png" },
-  { nombre: "Dr. Simi", ataque: 65, defensa: 95, imagen: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRvsWlM_-L_KvapF1G6EemU74xESV6iT1qVew&s" },
-  { nombre: "La Roca", ataque: 95, defensa: 80, imagen: "https://image-cdn.essentiallysports.com/wp-content/uploads/The-Rock-Dwayne-Johnson-1.png" },
-  { nombre: "Chabelo", ataque: 30, defensa: 100, imagen: "https://phantom-marca-mx.unidadeditorial.es/1c9cfde33650a22f724f9bcc92732dc8/resize/660/f/webp/mx/assets/multimedia/imagenes/2023/03/25/16797610129495.jpg" },
-  { nombre: "Capitán América", ataque: 85, defensa: 95, imagen: "https://www.pngitem.com/middle/JbTiJi_minions-png-minion-captain-america-png-transparent-png/" },
-  { nombre: "Shrek", ataque: 70, defensa: 50, imagen: "https://pbs.twimg.com/media/F2al76HXIAAECsx.jpg" },
-  { nombre: "Goku", ataque: 100, defensa: 90, imagen: "https://pbs.twimg.com/media/GtBWdtZXwAAqC0B?format=png&name=4096x4096" },
-  { nombre: "Spiderman", ataque: 80, defensa: 85, imagen: "https://i.imgur.com/Vxg7VEz.png" },
-  { nombre: "Julio Regalado", ataque: 80, defensa: 85, imagen: "https://i.imgur.com/W7J5pJz.png" },
-  { nombre: "Deadpool", ataque: 85, defensa: 70, imagen: "https://i.imgur.com/nUI2NEO.png" },
-  { nombre: "Iron Man", ataque: 90, defensa: 85, imagen: "https://i.imgur.com/tZ9hzo0.png" },
-  { nombre: "Thor", ataque: 95, defensa: 90, imagen: "https://i.imgur.com/1RJoNiB.png" },
-  { nombre: "MAMA LUCHA", ataque: 100, defensa: 80, imagen: "https://i.imgur.com/fmKS0gA.png" },
-  { nombre: "Wonder Woman", ataque: 75, defensa: 70, imagen: "https://i.imgur.com/fqMZwYy.png" },
-  { nombre: "Santa CLous", ataque: 80, defensa: 75, imagen: "https://i.imgur.com/ZZxGY2W.png" },
-  { nombre: "Chuponcito", ataque: 85, defensa: 80, imagen: "https://i.imgur.com/lv4cX2c.png" },
-  { nombre: "Gerry", ataque: 70, defensa: 55, imagen: "https://i.imgur.com/ZmV7x0n.png" },
-  { nombre: "Canelo", ataque: 75, defensa: 80, imagen: "https://i.imgur.com/k6UZ1Fx.png" },
-  { nombre: "Green Lantern", ataque: 58, defensa: 55, imagen: "https://i.imgur.com/1iVvxQn.png" },
-  { nombre: "Captain Marvel", ataque: 80, defensa: 75, imagen: "https://i.imgur.com/7pSZtC6.png" }
-];
+    const personajes = [
+      { nombre: "John Cena", ataque: 90, defensa: 80, imagen: "https://www.kindpng.com/picc/m/36-369716_john-cena-clipart-animated-john-cena-cartoon-png.png" },
+      { nombre: "Dr. Simi", ataque: 65, defensa: 95, imagen: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRvsWlM_-L_KvapF1G6EemU74xESV6iT1qVew&s" },
+      { nombre: "La Roca", ataque: 95, defensa: 80, imagen: "https://image-cdn.essentiallysports.com/wp-content/uploads/The-Rock-Dwayne-Johnson-1.png" },
+      { nombre: "Chabelo", ataque: 30, defensa: 100, imagen: "https://phantom-marca-mx.unidadeditorial.es/1c9cfde33650a22f724f9bcc92732dc8/resize/660/f/webp/mx/assets/multimedia/imagenes/2023/03/25/16797610129495.jpg" },
+      { nombre: "Capitán América", ataque: 85, defensa: 95, imagen: "https://www.pngitem.com/middle/JbTiJi_minions-png-minion-captain-america-png-transparent-png/" },
+      { nombre: "Shrek", ataque: 70, defensa: 50, imagen: "https://pbs.twimg.com/media/F2al76HXIAAECsx.jpg" },
+      { nombre: "Goku", ataque: 100, defensa: 90, imagen: "https://pbs.twimg.com/media/GtBWdtZXwAAqC0B?format=png&name=4096x4096" },
+      { nombre: "Spiderman", ataque: 80, defensa: 85, imagen: "https://i.imgur.com/Vxg7VEz.png" },
+    ];
 
- const playerDeck = document.getElementById("playerDeck");
-    const confirmBtn = document.getElementById("confirmBtn");
-    const playerImage = document.getElementById("playerImage");
-    const enemyImage = document.getElementById("enemyImage");
-    const result = document.getElementById("result");
+    const contenedor = document.getElementById('cartas-container');
+    const seleccionada = document.getElementById('seleccionada');
+    let jugador1 = null;
+    let jugador2 = null;
 
-    let selectedCard = null;
+    personajes.forEach((p, i) => {
+      const div = document.createElement('div');
+      div.classList.add('carta');
+      div.innerHTML = `<img src="${p.imagen}" alt="${p.nombre}">`;
+      div.onclick = () => seleccionarCarta(i);
+      contenedor.appendChild(div);
+    });
 
-    function drawCards(deck, count) {
-      const shuffled = characters.sort(() => 0.5 - Math.random());
-      return shuffled.slice(0, count);
+    function seleccionarCarta(index) {
+      if (jugador1 !== null && jugador2 !== null) return;
+
+      const jugador = personajes[index];
+
+      if (!jugador1) {
+        jugador1 = jugador;
+        seleccionada.innerHTML = `
+          <h2>Seleccionaste: ${jugador1.nombre}</h2>
+          <button onclick="confirmarSeleccion()">Confirmar</button>
+        `;
+      }
     }
 
-    function displayPlayerDeck(cards) {
-      cards.forEach((char, index) => {
-        const cardDiv = document.createElement("div");
-        cardDiv.className = "card";
-        cardDiv.innerText = char.name;
-        cardDiv.onclick = () => {
-          document.querySelectorAll(".card").forEach(el => el.classList.remove("selected"));
-          cardDiv.classList.add("selected");
-          selectedCard = char;
-          confirmBtn.disabled = false;
-        };
-        playerDeck.appendChild(cardDiv);
-      });
+    function confirmarSeleccion() {
+      if (jugador1) {
+        // Selecciona carta aleatoria para el oponente
+        let disponibles = personajes.filter(p => p !== jugador1);
+        jugador2 = disponibles[Math.floor(Math.random() * disponibles.length)];
+
+        mostrarVersus();
+      }
     }
 
-    confirmBtn.onclick = () => {
-      if (!selectedCard) return;
-      const enemyCard = characters[Math.floor(Math.random() * characters.length)];
-      playerImage.src = selectedCard.img;
-      playerImage.style.display = "block";
-      enemyImage.src = enemyCard.img;
-      enemyImage.style.display = "block";
+    function mostrarVersus() {
+      document.getElementById('img1').src = jugador1.imagen;
+      document.getElementById('img2').src = jugador2.imagen;
+      document.getElementById('versus').style.display = 'block';
 
-      const winner = Math.random() > 0.5 ? "player" : "enemy";
+      // Lógica de combate:
+      const puntos1 = jugador1.defensa - jugador2.ataque;
+      const puntos2 = jugador2.defensa - jugador1.ataque;
 
-      setTimeout(() => {
-        result.innerText =
-          winner === "player"
-            ? "YOU WIN!"
-            : "YOU ARE A PUSSY";
-        result.style.color = winner === "player" ? "limegreen" : "red";
-      }, 500);
-    };
+      let resultado = '';
+      if (puntos1 > puntos2) {
+        resultado = `🏆 ¡${jugador1.nombre} gana!`;
+      } else if (puntos2 > puntos1) {
+        resultado = `🏆 ¡${jugador2.nombre} gana!`;
+      } else {
+        resultado = "🤝 ¡Empate!";
+      }
 
-    const drawn = drawCards(characters, 5);
-    displayPlayerDeck(drawn);
+      document.getElementById('resultado').textContent = resultado;
+    }
   </script>
+
 </body>
 </html>
