@@ -1,180 +1,113 @@
 <!DOCTYPE html>
-<html lang="es">
+<html lang="en">
 <head>
-<meta charset="UTF-8" />
-<title>Juego de Cartas - Batalla VS</title>
-<link href="https://fonts.googleapis.com/css2?family=Roboto:wght@700&display=swap" rel="stylesheet" />
-<style>
-  * { box-sizing: border-box; }
-  body {
-    font-family: 'Roboto', sans-serif;
-    margin: 0;
-    background: linear-gradient(to bottom, #0f2027, #203a43, #2c5364);
-    color: #eee;
-    text-align: center;
-  }
-  h1 { margin-top: 20px; margin-bottom: 10px;}
-  .game-container {
-    display: flex;
-    justify-content: space-between;
-    align-items: flex-start;
-    padding: 20px 40px;
-    gap: 20px;
-  }
-  .player {
-    background: rgba(255, 255, 255, 0.05);
-    border-radius: 20px;
-    padding: 20px;
-    width: 280px;
-    box-shadow: 0 8px 16px rgba(0,0,0,0.3);
-  }
-  .cards-list {
-    display: flex;
-    flex-wrap: wrap;
-    justify-content: center;
-    gap: 10px;
-    margin-top: 10px;
-    min-height: 130px;
-  }
-  .card {
-    background: linear-gradient(135deg, #1e90ff, #00bfff);
-    border-radius: 15px;
-    box-shadow: 0 5px 15px rgba(0,0,0,0.5);
-    padding: 10px;
-    width: 110px;
-    color: #fff;
-    cursor: pointer;
-    transition: transform 0.3s, box-shadow 0.3s;
-  }
-  .card.selected {
-    box-shadow: 0 0 20px 4px #ff6b6b;
-    transform: scale(1.1);
-  }
-  .card img {
-    width: 90px;
-    height: 90px;
-    border-radius: 12px;
-    margin-bottom: 5px;
-    border: 3px solid #fff;
-  }
-  .stats {
-    display: flex;
-    justify-content: space-around;
-  }
-  .stat {
-    background: rgba(0,0,0,0.3);
-    padding: 3px 6px;
-    border-radius: 8px;
-    font-size: 14px;
-  }
-  button {
-    margin-top: 10px;
-    padding: 12px 25px;
-    font-size: 16px;
-    border-radius: 12px;
-    border: none;
-    background: #ff6b6b;
-    color: white;
-    font-weight: bold;
-    cursor: pointer;
-    transition: background 0.3s;
-  }
-  button:disabled {
-    background: #999;
-    cursor: not-allowed;
-  }
-  button:hover:not(:disabled) {
-    background: #ff4757;
-  }
-  #centerArea {
-    flex: 1;
-    max-width: 350px;
-    background: rgba(255,255,255,0.1);
-    border-radius: 20px;
-    padding: 20px;
-    box-shadow: 0 8px 20px rgba(0,0,0,0.5);
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-  }
-  #vsText {
-    font-size: 60px;
-    font-weight: 900;
-    margin: 0 0 10px 0;
-    color: #ff6b6b;
-    text-shadow: 0 0 15px #ff6b6b;
-  }
-  #battleCards {
-    display: flex;
-    justify-content: center;
-    gap: 30px;
-    margin-bottom: 20px;
-    min-height: 150px;
-  }
-  #battleCards .card {
-    cursor: default;
-  }
-  #result {
-    font-size: 30px;
-    font-weight: 700;
-    min-height: 40px;
-    color: #fff;
-    text-shadow: 0 0 5px #000;
-  }
-  #finalResult {
-    position: fixed;
-    top: 50%;
-    left: 50%;
-    transform: translate(-50%, -50%);
-    font-size: 70px;
-    font-weight: 900;
-    display: none;
-    padding: 40px 60px;
-    border-radius: 20px;
-    z-index: 100;
-    background: rgba(0,0,0,0.85);
-    color: #00ff00;
-    text-shadow: 0 0 20px #00ff00;
-  }
-  #finalResult.lose {
-    color: #ff2222;
-    text-shadow: 0 0 20px #ff2222;
-  }
-</style>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Carta VS</title>
+  <style>
+    body {
+      margin: 0;
+      padding: 0;
+      font-family: Arial, sans-serif;
+      background-color: #121212;
+      color: white;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+    }
+
+    h1 {
+      margin: 20px 0;
+      text-align: center;
+    }
+
+    #game {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      width: 90%;
+      max-width: 1200px;
+      margin: 20px auto;
+    }
+
+    .deck {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+      align-items: center;
+    }
+
+    .card {
+      width: 100px;
+      height: 150px;
+      background-color: #333;
+      border: 2px solid white;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      cursor: pointer;
+    }
+
+    .card.selected {
+      border-color: limegreen;
+    }
+
+    .vs-area {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 20px;
+    }
+
+    .vs-text {
+      font-size: 4rem;
+      font-weight: bold;
+      color: red;
+    }
+
+    .card-image {
+      width: 200px;
+      height: auto;
+    }
+
+    #result {
+      font-size: 3rem;
+      margin-top: 30px;
+      text-align: center;
+    }
+
+    #confirmBtn {
+      margin-top: 10px;
+      padding: 10px 20px;
+      font-size: 1rem;
+      background: limegreen;
+      border: none;
+      cursor: pointer;
+    }
+  </style>
 </head>
 <body>
+  <h1>Selecciona tu carta</h1>
+  <div id="game">
+    <div class="deck" id="playerDeck"></div>
 
-<h1>Juego de Cartas Batalla - Selecciona tu carta</h1>
-<button id="startBtn">Iniciar Partida</button>
-<div class="game-container">
-  <!-- Jugador 1 -->
-  <div class="player" id="player1">
-    <h2>Jugador 1 (<span id="player1Count">0</span> cartas)</h2>
-    <div id="player1Cards" class="cards-list"></div>
-  </div>
-
-  <!-- Centro VS -->
-  <div id="centerArea">
-    <div id="vsText">VS</div>
-    <div id="battleCards">
-      <div id="playerCardArea"></div>
-      <div id="cpuCardArea"></div>
+    <div class="vs-area">
+      <div class="vs-text">VS</div>
+      <div class="vs-cards">
+        <img id="playerImage" class="card-image" src="" style="display:none" />
+        <img id="enemyImage" class="card-image" src="" style="display:none" />
+      </div>
+      <button id="confirmBtn" disabled>CONFIRMAR</button>
+      <div id="result"></div>
     </div>
-    <button id="playBtn" disabled>Jugar Carta Seleccionada</button>
-    <div id="result"></div>
+
+    <div class="deck" id="enemyDeck">
+      <div class="card">???</div>
+    </div>
   </div>
 
-  <!-- CPU -->
-  <div class="player" id="player2">
-    <h2>CPU (<span id="player2Count">0</span> cartas)</h2>
-    <div id="player2Cards" class="cards-list"></div>
-  </div>
-</div>
-
-<div id="finalResult"></div>
-
-<script>
-const cartas = [
+  <script>
+    const characters = [
   { nombre: "John Cena", ataque: 90, defensa: 80, imagen: "https://www.kindpng.com/picc/m/36-369716_john-cena-clipart-animated-john-cena-cartoon-png.png" },
   { nombre: "Dr. Simi", ataque: 65, defensa: 95, imagen: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRvsWlM_-L_KvapF1G6EemU74xESV6iT1qVew&s" },
   { nombre: "La Roca", ataque: 95, defensa: 80, imagen: "https://image-cdn.essentiallysports.com/wp-content/uploads/The-Rock-Dwayne-Johnson-1.png" },
@@ -197,164 +130,55 @@ const cartas = [
   { nombre: "Captain Marvel", ataque: 80, defensa: 75, imagen: "https://i.imgur.com/7pSZtC6.png" }
 ];
 
-let mazo1 = [];
-let mazo2 = [];
-let cartaSeleccionadaIndex = null;
-let cartaJugadorSeleccionada = null;
-let cartaCPUSeleccionada = null;
+ const playerDeck = document.getElementById("playerDeck");
+    const confirmBtn = document.getElementById("confirmBtn");
+    const playerImage = document.getElementById("playerImage");
+    const enemyImage = document.getElementById("enemyImage");
+    const result = document.getElementById("result");
 
-const player1Count = document.getElementById("player1Count");
-const player2Count = document.getElementById("player2Count");
-const player1CardsDiv = document.getElementById("player1Cards");
-const player2CardsDiv = document.getElementById("player2Cards");
-const playerCardArea = document.getElementById("playerCardArea");
-const cpuCardArea = document.getElementById("cpuCardArea");
-const resultDiv = document.getElementById("result");
-const finalResultDiv = document.getElementById("finalResult");
-const startBtn = document.getElementById("startBtn");
-const playBtn = document.getElementById("playBtn");
+    let selectedCard = null;
 
-startBtn.onclick = () => {
-  finalResultDiv.style.display = "none";
-  resultDiv.textContent = "";
-  cartaSeleccionadaIndex = null;
-  cartaJugadorSeleccionada = null;
-  cartaCPUSeleccionada = null;
-  playBtn.disabled = true;
+    function drawCards(deck, count) {
+      const shuffled = characters.sort(() => 0.5 - Math.random());
+      return shuffled.slice(0, count);
+    }
 
-  const baraja = [...cartas].sort(() => Math.random() - 0.5);
-  mazo1 = baraja.slice(0, 5);
-  mazo2 = baraja.slice(5, 10);
+    function displayPlayerDeck(cards) {
+      cards.forEach((char, index) => {
+        const cardDiv = document.createElement("div");
+        cardDiv.className = "card";
+        cardDiv.innerText = char.name;
+        cardDiv.onclick = () => {
+          document.querySelectorAll(".card").forEach(el => el.classList.remove("selected"));
+          cardDiv.classList.add("selected");
+          selectedCard = char;
+          confirmBtn.disabled = false;
+        };
+        playerDeck.appendChild(cardDiv);
+      });
+    }
 
-  actualizarUI();
-  mostrarCartasJugador();
-  mostrarCartasCPU();
+    confirmBtn.onclick = () => {
+      if (!selectedCard) return;
+      const enemyCard = characters[Math.floor(Math.random() * characters.length)];
+      playerImage.src = selectedCard.img;
+      playerImage.style.display = "block";
+      enemyImage.src = enemyCard.img;
+      enemyImage.style.display = "block";
 
-  playerCardArea.innerHTML = "";
-  cpuCardArea.innerHTML = "";
-};
+      const winner = Math.random() > 0.5 ? "player" : "enemy";
 
-function actualizarUI() {
-  player1Count.textContent = mazo1.length;
-  player2Count.textContent = mazo2.length;
-}
+      setTimeout(() => {
+        result.innerText =
+          winner === "player"
+            ? "YOU WIN!"
+            : "YOU ARE A PUSSY";
+        result.style.color = winner === "player" ? "limegreen" : "red";
+      }, 500);
+    };
 
-function mostrarCartasJugador() {
-  player1CardsDiv.innerHTML = "";
-  mazo1.forEach((carta, index) => {
-    const cardDiv = document.createElement("div");
-    cardDiv.className = "card";
-    cardDiv.innerHTML = `
-      <img src="${carta.imagen}" alt="${carta.nombre}" />
-      <h4>${carta.nombre}</h4>
-      <div class="stats">
-        <div class="stat">⚔️ ${carta.ataque}</div>
-        <div class="stat">🛡️ ${carta.defensa}</div>
-      </div>
-    `;
-    cardDiv.onclick = () => seleccionarCarta(index);
-    if (index === cartaSeleccionadaIndex) cardDiv.classList.add("selected");
-    player1CardsDiv.appendChild(cardDiv);
-  });
-}
-
-function mostrarCartasCPU() {
-  player2CardsDiv.innerHTML = "";
-  mazo2.forEach(carta => {
-    const cardDiv = document.createElement("div");
-    cardDiv.className = "card";
-    cardDiv.style.cursor = "default";
-    cardDiv.innerHTML = `
-      <img src="${carta.imagen}" alt="${carta.nombre}" />
-      <h4>${carta.nombre}</h4>
-      <div class="stats">
-        <div class="stat">⚔️ ${carta.ataque}</div>
-        <div class="stat">🛡️ ${carta.defensa}</div>
-      </div>
-    `;
-    player2CardsDiv.appendChild(cardDiv);
-  });
-}
-
-function seleccionarCarta(index) {
-  cartaSeleccionadaIndex = index;
-  mostrarCartasJugador();
-  playBtn.disabled = false;
-}
-
-playBtn.onclick = () => {
-  if (cartaSeleccionadaIndex === null) return;
-
-  // Carta del jugador seleccionada
-  cartaJugadorSeleccionada = mazo1.splice(cartaSeleccionadaIndex, 1)[0];
-  cartaSeleccionadaIndex = null;
-
-  // Carta CPU: la primera del mazo
-  cartaCPUSeleccionada = mazo2.shift();
-
-  // Mostrar cartas en centro
-  mostrarCartaEnArea(playerCardArea, cartaJugadorSeleccionada);
-  mostrarCartaEnArea(cpuCardArea, cartaCPUSeleccionada);
-
-  // Mostrar cartas restantes
-  mostrarCartasJugador();
-  mostrarCartasCPU();
-
-  // Desactivar botón jugar mientras se ve resultado
-  playBtn.disabled = true;
-
-  // Comparar ataque y defensa
-  let resultadoTexto = "";
-  if (cartaJugadorSeleccionada.ataque > cartaCPUSeleccionada.defensa && cartaCPUSeleccionada.ataque <= cartaJugadorSeleccionada.defensa) {
-    resultadoTexto = `¡${cartaJugadorSeleccionada.nombre} gana la ronda!`;
-    mazo1.push(cartaJugadorSeleccionada, cartaCPUSeleccionada); // jugador se queda con ambas
-  } else if (cartaCPUSeleccionada.ataque > cartaJugadorSeleccionada.defensa && cartaJugadorSeleccionada.ataque <= cartaCPUSeleccionada.defensa) {
-    resultadoTexto = `¡${cartaCPUSeleccionada.nombre} gana la ronda!`;
-    mazo2.push(cartaJugadorSeleccionada, cartaCPUSeleccionada); // CPU se queda con ambas
-  } else {
-    resultadoTexto = "¡Empate! Ambas cartas eliminadas.";
-    // ninguna carta regresa al mazo
-  }
-  resultDiv.textContent = resultadoTexto;
-  actualizarUI();
-
-  // Revisar si alguien perdió todas las cartas
-  if (mazo1.length === 0 || mazo2.length === 0) mostrarGanador();
-};
-
-function mostrarCartaEnArea(container, carta) {
-  container.innerHTML = `
-    <div class="card selected" style="cursor: default;">
-      <img src="${carta.imagen}" alt="${carta.nombre}" />
-      <h4>${carta.nombre}</h4>
-      <div class="stats">
-        <div class="stat">⚔️ ${carta.ataque}</div>
-        <div class="stat">🛡️ ${carta.defensa}</div>
-      </div>
-    </div>
-  `;
-}
-
-function mostrarGanador() {
-  let mensaje = "";
-  let clase = "";
-  if (mazo1.length > 0 && mazo2.length === 0) {
-    mensaje = "YOU WIN";
-    clase = "win";
-  } else if (mazo2.length > 0 && mazo1.length === 0) {
-    mensaje = "YOU ARE A PUSSY";
-    clase = "lose";
-  } else {
-    mensaje = "EMPATE";
-    clase = "";
-  }
-  finalResultDiv.textContent = mensaje;
-  finalResultDiv.className = clase;
-  finalResultDiv.style.display = "block";
-  playBtn.disabled = true;
-}
-</script>
-
+    const drawn = drawCards(characters, 5);
+    displayPlayerDeck(drawn);
+  </script>
 </body>
 </html>
-
